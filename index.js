@@ -27,7 +27,8 @@ let persons = [
 const app = express()
 app.use(express.json())
 
-app.use(morgan('tiny'))
+morgan.token('data', (req, res)=>JSON.stringify(req.body))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
 
 app.get('/api/persons',
     (req, res) => {
