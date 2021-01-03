@@ -38,6 +38,18 @@ app.get('/info',
         )
     })
 
+app.get('/api/persons/:id',(req, res)=>{
+    const id = Number(req.params.id)
+    const person = persons.find((p)=>p.id===id)
+
+
+    if(!person){
+        res.status(404).end()
+        return  // necessary to exit from the callback
+    }
+    res.send(person)
+})
+
 const PORT = 3001
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`))
 
