@@ -72,9 +72,15 @@ app.post('/api/persons', (req, res) => {
         res.status(400).json({error: "name and number must be specified"})
         return
     }
+
+    if(persons.filter(p=>p.name===req.body.name).length){
+        res.status(400).json({error: "name must be unique"})
+        return
+    }
+
     const newContact = {
         name: body.name,
-        number: body.name,
+        number: body.number,
         id: generateRandomId()
     }
     persons = persons.concat(newContact)
