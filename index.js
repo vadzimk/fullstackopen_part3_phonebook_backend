@@ -30,7 +30,13 @@ app.get('/api/persons',
     (req, res) => {
         res.json(persons)
     })
-
+app.get('/info',
+    (req, res) => {
+        res.send(
+            `<p>Phonebook has info for ${persons.length} people</p>
+                <p>${(new Date()).toUTCString()}</p>`
+        )
+    })
 
 const PORT = 3001
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`))
