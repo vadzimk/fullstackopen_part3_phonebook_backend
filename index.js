@@ -1,5 +1,6 @@
 import express from 'express'
-import morgan from 'morgan'
+// import morgan from 'morgan'
+import cors from 'cors'
 
 let persons = [
     {
@@ -25,10 +26,23 @@ let persons = [
 ]
 
 const app = express()
+app.use(cors())  // enables cross origin resource sharing
 app.use(express.json())
 
-morgan.token('data', (req, res)=>JSON.stringify(req.body))
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
+
+// morgan.token('data', (req, res)=>JSON.stringify(req.body))
+// app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
+
+// middleware is a func that has access (can modify) to req, res objects and calls next middleware at the end
+// req.body is is initialized in express.json() -- body parser
+const requestLogger = (req, res, next) => {
+    console.log('Method', req.method)
+    console.log('Path', req.path)
+    console.log('Body', req.body)
+    console.log('--------')
+    next()
+}
+app.use(requestLogger)
 
 app.get('/api/persons',
     (req, res) => {
@@ -91,6 +105,6 @@ app.post('/api/persons', (req, res) => {
     res.json(newContact) // echos back the created contact
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`))
 
