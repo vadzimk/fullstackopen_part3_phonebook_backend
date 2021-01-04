@@ -27,6 +27,7 @@ let persons = [
 
 const app = express()
 app.use(cors())  // enables cross origin resource sharing
+app.use(express.static('build'))  // GET requests are first processed from the build folder - front end part
 app.use(express.json())
 
 
