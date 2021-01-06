@@ -3,28 +3,28 @@ import express from 'express'
 import cors from 'cors'
 import Person from "./models/person.js";
 
-let persons = [
-    {
-        "name": "Arto Hellas",
-        "number": "040-123456",
-        "id": 1
-    },
-    {
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523",
-        "id": 2
-    },
-    {
-        "name": "Dan Abramov",
-        "number": "12-43-234345",
-        "id": 3
-    },
-    {
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122",
-        "id": 4
-    }
-]
+// let persons = [
+//     {
+//         "name": "Arto Hellas",
+//         "number": "040-123456",
+//         "id": 1
+//     },
+//     {
+//         "name": "Ada Lovelace",
+//         "number": "39-44-5323523",
+//         "id": 2
+//     },
+//     {
+//         "name": "Dan Abramov",
+//         "number": "12-43-234345",
+//         "id": 3
+//     },
+//     {
+//         "name": "Mary Poppendieck",
+//         "number": "39-23-6423122",
+//         "id": 4
+//     }
+// ]
 
 const app = express()
 app.use(cors())  // enables cross origin resource sharing
@@ -76,10 +76,18 @@ app.get('/api/persons/:id', (req, res) => {
     res.send(person)
 })
 
-app.delete('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    persons = persons.filter(p => p.id !== id)
-    res.status(204).end()
+app.delete('/api/persons/:id',
+    (req, res, next) => {
+
+    Person.findByIdAndRemove(req.params.id)
+        .then(result=>{
+            if(result){
+                res.status(204).end()
+            } else{
+                res.status(404).end()
+            }
+        })
+        .catch(err=>next(err))
 })
 
 // const generateId = () => Math.max(...persons.map(p => p.id)) + 1
@@ -104,14 +112,31 @@ app.post('/api/persons', (req, res) => {
         return
     }
 
-    const newContact = {
+    const person = new Person({
         name: body.name,
         number: body.number,
-        id: generateRandomId()
-    }
-    persons = persons.concat(newContact)
-    res.json(newContact) // echos back the created contact
+        // id: generateRandomId()
+    })
+    person.save()
+        .then(savedPerson => {
+            res.json(savedPerson) // echos back the created contact
+            // json will format the object with toJSON method.
+        })
+        .catch(err => {
+            console.log("error saving note", err)
+        })
+
+
 })
+
+
+
+const errorHandler = (error, request, response, next)=>{
+    console.log(error.message)
+    next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`))
