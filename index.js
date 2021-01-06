@@ -100,17 +100,18 @@ const generateRandomId = () => {
     return id
 }
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons',
+    (req, res,next) => {
     const body = req.body
     if (!body.name || !body.number) {
         res.status(400).json({error: "name and number must be specified"})
         return
     }
 
-    if (persons.filter(p => p.name === req.body.name).length) {
-        res.status(400).json({error: "name must be unique"})
-        return
-    }
+    // if (persons.filter(p => p.name === req.body.name).length) {
+    //     res.status(400).json({error: "name must be unique"})
+    //     return
+    // }
 
     const person = new Person({
         name: body.name,
@@ -122,9 +123,7 @@ app.post('/api/persons', (req, res) => {
             res.json(savedPerson) // echos back the created contact
             // json will format the object with toJSON method.
         })
-        .catch(err => {
-            console.log("error saving note", err)
-        })
+        .catch(err => next(err))
 
 
 })
