@@ -47,22 +47,20 @@ const requestLogger = (req, res, next) => {
 app.use(requestLogger)
 
 app.get('/api/persons',
-    (req, res) => {
+    (req, res,next) => {
         Person.find({}).then(
             persons => {
                 res.json(persons)
-            }).catch(err => {
-            console.log('error find all persons', err)
-        })
+            }).catch(err => next(err))
     })
 
-app.get('/info',
-    (req, res) => {
-        res.send(
-            `<p>Phonebook has info for ${persons.length} people</p>
-                <p>${(new Date()).toUTCString()}</p>`
-        )
-    })
+// app.get('/info',
+//     (req, res) => {
+//         res.send(
+//             `<p>Phonebook has info for ${persons.length} people</p>
+//                 <p>${(new Date()).toUTCString()}</p>`
+//         )
+//     })
 
 app.get('/api/persons/:id', (req, res) => {
     const id = Number(req.params.id)
@@ -91,14 +89,14 @@ app.delete('/api/persons/:id',
 })
 
 // const generateId = () => Math.max(...persons.map(p => p.id)) + 1
-const generateRandomId = () => {
-    let id
-    do {
-        id = Math.floor(Math.random() * (Math.pow(10, 20) - 1) + 1)
-    }
-    while (persons.find(p => p.id === id))
-    return id
-}
+// const generateRandomId = () => {
+//     let id
+//     do {
+//         id = Math.floor(Math.random() * (Math.pow(10, 20) - 1) + 1)
+//     }
+//     while (persons.find(p => p.id === id))
+//     return id
+// }
 
 app.post('/api/persons',
     (req, res,next) => {
@@ -132,6 +130,9 @@ app.post('/api/persons',
 
 const errorHandler = (error, request, response, next)=>{
     console.log(error.message)
+    if (error.name === 'CastError'){  // handles particular error if this is it
+        return response.status(400).send({error: 'malformatted id'})
+    }
     next(error)
 }
 
