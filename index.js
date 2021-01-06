@@ -47,7 +47,7 @@ const requestLogger = (req, res, next) => {
 app.use(requestLogger)
 
 app.get('/api/persons',
-    (req, res,next) => {
+    (req, res, next) => {
         Person.find({}).then(
             persons => {
                 res.json(persons)
@@ -74,19 +74,31 @@ app.get('/api/persons/:id', (req, res) => {
     res.send(person)
 })
 
+
+app.put('/api/persons/:id',
+    (req, res, next) => {
+    const person = {
+        name: req.body.name,
+        number: req.body.number
+    }
+        Person.findByIdAndUpdate(req.params.id, person,{new:true})
+            .then(updatedPerson=>{res.json(updatedPerson)})
+            .catch(err=>next(err))
+    })
+
+
 app.delete('/api/persons/:id',
     (req, res, next) => {
-
-    Person.findByIdAndRemove(req.params.id)
-        .then(result=>{
-            if(result){
-                res.status(204).end()
-            } else{
-                res.status(404).end()
-            }
-        })
-        .catch(err=>next(err))
-})
+        Person.findByIdAndRemove(req.params.id)
+            .then(result => {
+                if (result) {
+                    res.status(204).end()
+                } else {
+                    res.status(404).end()
+                }
+            })
+            .catch(err => next(err))
+    })
 
 // const generateId = () => Math.max(...persons.map(p => p.id)) + 1
 // const generateRandomId = () => {
@@ -99,38 +111,37 @@ app.delete('/api/persons/:id',
 // }
 
 app.post('/api/persons',
-    (req, res,next) => {
-    const body = req.body
-    if (!body.name || !body.number) {
-        res.status(400).json({error: "name and number must be specified"})
-        return
-    }
+    (req, res, next) => {
+        const body = req.body
+        if (!body.name || !body.number) {
+            res.status(400).json({error: "name and number must be specified"})
+            return
+        }
 
-    // if (persons.filter(p => p.name === req.body.name).length) {
-    //     res.status(400).json({error: "name must be unique"})
-    //     return
-    // }
+        // if (persons.filter(p => p.name === req.body.name).length) {
+        //     res.status(400).json({error: "name must be unique"})
+        //     return
+        // }
 
-    const person = new Person({
-        name: body.name,
-        number: body.number,
-        // id: generateRandomId()
-    })
-    person.save()
-        .then(savedPerson => {
-            res.json(savedPerson) // echos back the created contact
-            // json will format the object with toJSON method.
+        const person = new Person({
+            name: body.name,
+            number: body.number,
+            // id: generateRandomId()
         })
-        .catch(err => next(err))
+        person.save()
+            .then(savedPerson => {
+                res.json(savedPerson) // echos back the created contact
+                // json will format the object with toJSON method.
+            })
+            .catch(err => next(err))
 
 
-})
+    })
 
 
-
-const errorHandler = (error, request, response, next)=>{
+const errorHandler = (error, request, response, next) => {
     console.log(error.message)
-    if (error.name === 'CastError'){  // handles particular error if this is it
+    if (error.name === 'CastError') {  // handles particular error if this is it
         return response.status(400).send({error: 'malformatted id'})
     }
     next(error)
