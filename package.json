@@ -25,7 +25,8 @@
   "homepage": "https://github.com/vadzimk/fullstackopen_part3_phonebook_backend#readme",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mongoose": "^5.11.10"
   },
   "devDependencies": {
     "morgan": "^1.10.0"
