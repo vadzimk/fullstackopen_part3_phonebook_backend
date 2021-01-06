@@ -54,24 +54,28 @@ app.get('/api/persons',
             }).catch(err => next(err))
     })
 
-// app.get('/info',
-//     (req, res) => {
-//         res.send(
-//             `<p>Phonebook has info for ${persons.length} people</p>
-//                 <p>${(new Date()).toUTCString()}</p>`
-//         )
-//     })
+app.get('/info',
+    (req, res, next) => {
+        Person.estimatedDocumentCount()
+            .then(number=>{
+                res.send(
+                    `<p>Phonebook has info for ${number} people</p>
+                <p>${(new Date()).toUTCString()}</p>`
+                )
+            })
+            .catch(err=>next(err))
+    })
 
-app.get('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    const person = persons.find((p) => p.id === id)
-
-
-    if (!person) {
-        res.status(404).end()
-        return  // necessary to exit from the callback
-    }
-    res.send(person)
+app.get('/api/persons/:id', (req, res, next) => {
+    Person.findById(req.params.id)
+        .then(person=>{
+            if(person){
+                res.json(person)
+            } else {
+                res.status(404).end()
+            }
+        })
+        .catch(err=>next(err))
 })
 
 
@@ -134,8 +138,6 @@ app.post('/api/persons',
                 // json will format the object with toJSON method.
             })
             .catch(err => next(err))
-
-
     })
 
 
