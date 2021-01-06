@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import uniqueValidator from 'mongoose-unique-validator'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -14,9 +15,11 @@ mongoose.connect(url,
     .catch(err=>{console.log("error connecting to MongDB:", err.message)})
 
 const personSchema = new mongoose.Schema({
-    name: String,
+    name: {type: String, unique: true},
     number: String,
 })
+
+personSchema.plugin(uniqueValidator)  // apply plugin to schema - adds pre-save validation for unique fields within mongoose schema.
 
 personSchema.set('toJSON',{
     transform: (doc, returnedObj)=>{
