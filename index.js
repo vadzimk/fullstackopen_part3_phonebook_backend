@@ -1,6 +1,7 @@
 import express from 'express'
 // import morgan from 'morgan'
 import cors from 'cors'
+import Person from "./models/person.js";
 
 let persons = [
     {
@@ -47,8 +48,14 @@ app.use(requestLogger)
 
 app.get('/api/persons',
     (req, res) => {
-        res.json(persons)
+        Person.find({}).then(
+            persons => {
+                res.json(persons)
+            }).catch(err => {
+            console.log('error find all persons', err)
+        })
     })
+
 app.get('/info',
     (req, res) => {
         res.send(
@@ -76,12 +83,12 @@ app.delete('/api/persons/:id', (req, res) => {
 })
 
 // const generateId = () => Math.max(...persons.map(p => p.id)) + 1
-const generateRandomId =()=>{
+const generateRandomId = () => {
     let id
     do {
-        id = Math.floor(Math.random() * (Math.pow(10, 20)-1)+1)
+        id = Math.floor(Math.random() * (Math.pow(10, 20) - 1) + 1)
     }
-    while(persons.find(p=>p.id===id))
+    while (persons.find(p => p.id === id))
     return id
 }
 
@@ -92,7 +99,7 @@ app.post('/api/persons', (req, res) => {
         return
     }
 
-    if(persons.filter(p=>p.name===req.body.name).length){
+    if (persons.filter(p => p.name === req.body.name).length) {
         res.status(400).json({error: "name must be unique"})
         return
     }
