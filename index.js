@@ -57,37 +57,43 @@ app.get('/api/persons',
 app.get('/info',
     (req, res, next) => {
         Person.estimatedDocumentCount()
-            .then(number=>{
+            .then(number => {
                 res.send(
                     `<p>Phonebook has info for ${number} people</p>
                 <p>${(new Date()).toUTCString()}</p>`
                 )
             })
-            .catch(err=>next(err))
+            .catch(err => next(err))
     })
 
 app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id)
-        .then(person=>{
-            if(person){
+        .then(person => {
+            if (person) {
                 res.json(person)
             } else {
                 res.status(404).end()
             }
         })
-        .catch(err=>next(err))
+        .catch(err => next(err))
 })
 
 
 app.put('/api/persons/:id',
     (req, res, next) => {
-    const person = {
-        name: req.body.name,
-        number: req.body.number
-    }
-        Person.findByIdAndUpdate(req.params.id, person,{new:true})
-            .then(updatedPerson=>{res.json(updatedPerson)})
-            .catch(err=>next(err))
+        const person = {
+            name: req.body.name,
+            number: req.body.number
+        }
+        const opts = {  // object that provides options to the method findByIdAndUpdate
+            new: true,  // signals to return the updated object on success
+            runValidators: true // signals to run validators on update (off for update by default)
+        }
+        Person.findByIdAndUpdate(req.params.id, person, opts)
+            .then(updatedPerson => {
+                res.json(updatedPerson)
+            })
+            .catch(err => next(err))
     })
 
 
@@ -147,7 +153,7 @@ const errorHandler = (error, request, response, next) => {
     if (error.name === 'CastError') {  // handles particular error if this is it
         return response.status(400).send({error: 'malformatted id'})
     }
-    if (error.name === 'ValidationError'){
+    if (error.name === 'ValidationError') {
         return response.status(400).send({error: error.message})
     }
     next(error)
