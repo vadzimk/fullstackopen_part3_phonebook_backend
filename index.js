@@ -65,7 +65,8 @@ app.put('/api/persons/:id',
         }
         const opts = {  // object that provides options to the method findByIdAndUpdate
             new: true,  // signals to return the updated object on success
-            runValidators: true // signals to run validators on update (off for update by default)
+            runValidators: true, // signals to run validators on update (off for update by default)
+            context: 'query'  // required by mongoose-unique-validator
         }
         Person.findByIdAndUpdate(req.params.id, person, opts)
             .then(updatedPerson => {
