@@ -50,7 +50,7 @@ app.get('/api/persons',
     (req, res, next) => {
         Person.find({}).then(
             persons => {
-                res.json(persons)
+                res.json(persons.map(p=>p.toJSON))  // toJSON transforms each document in necessary way
             }).catch(err => next(err))
     })
 
@@ -70,7 +70,7 @@ app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id)
         .then(person => {
             if (person) {
-                res.json(person)
+                res.json(person.toJSON())  // call toJSON to transform the object
             } else {
                 res.status(404).end()
             }
@@ -91,7 +91,7 @@ app.put('/api/persons/:id',
         }
         Person.findByIdAndUpdate(req.params.id, person, opts)
             .then(updatedPerson => {
-                res.json(updatedPerson)
+                res.json(updatedPerson.toJSON())
             })
             .catch(err => next(err))
     })
@@ -110,15 +110,6 @@ app.delete('/api/persons/:id',
             .catch(err => next(err))
     })
 
-// const generateId = () => Math.max(...persons.map(p => p.id)) + 1
-// const generateRandomId = () => {
-//     let id
-//     do {
-//         id = Math.floor(Math.random() * (Math.pow(10, 20) - 1) + 1)
-//     }
-//     while (persons.find(p => p.id === id))
-//     return id
-// }
 
 app.post('/api/persons',
     (req, res, next) => {
@@ -128,19 +119,14 @@ app.post('/api/persons',
             return
         }
 
-        // if (persons.filter(p => p.name === req.body.name).length) {
-        //     res.status(400).json({error: "name must be unique"})
-        //     return
-        // }
-
         const person = new Person({
             name: body.name,
             number: body.number,
-            // id: generateRandomId()
+
         })
         person.save()
             .then(savedPerson => {
-                res.json(savedPerson) // echos back the created contact
+                res.json(savedPerson.toJSON()) // echos back the created contact
                 // json will format the object with toJSON method.
             })
             .catch(err => next(err))
