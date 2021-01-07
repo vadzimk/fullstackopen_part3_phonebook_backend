@@ -3,28 +3,6 @@ import express from 'express'
 import cors from 'cors'
 import Person from "./models/person.js";
 
-// let persons = [
-//     {
-//         "name": "Arto Hellas",
-//         "number": "040-123456",
-//         "id": 1
-//     },
-//     {
-//         "name": "Ada Lovelace",
-//         "number": "39-44-5323523",
-//         "id": 2
-//     },
-//     {
-//         "name": "Dan Abramov",
-//         "number": "12-43-234345",
-//         "id": 3
-//     },
-//     {
-//         "name": "Mary Poppendieck",
-//         "number": "39-23-6423122",
-//         "id": 4
-//     }
-// ]
 
 const app = express()
 app.use(cors())  // enables cross origin resource sharing
@@ -50,7 +28,7 @@ app.get('/api/persons',
     (req, res, next) => {
         Person.find({}).then(
             persons => {
-                res.json(persons.map(p=>p.toJSON))  // toJSON transforms each document in necessary way
+                res.json(persons.map(p=>p.toJSON()))  // toJSON transforms each document in necessary way
             }).catch(err => next(err))
     })
 
